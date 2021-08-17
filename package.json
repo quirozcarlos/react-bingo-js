@@ -1,0 +1,43 @@
+{
+  "name": "react-bingo-js",
+  "version": "1.0.0",
+  "description": "React Bingo JS",
+  "main": "index.js",
+  "scripts": {
+    "clean": "shx rm -rf dist _modules",
+    "build": "yarn run clean && babel ./src --out-dir ./_modules && webpack --config webpack.prod.js",
+    "serve": "npx webpack serve --config webpack.dev.js",
+    "lint": "standard",
+    "test": "cypress open"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-syntax-jsx": "^7.12.1",
+    "@babel/plugin-transform-runtime": "^7.12.1",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-react": "^7.12.1",
+    "@webpack-cli/serve": "^1.0.1",
+    "babel-loader": "^8.1.0",
+    "copy-webpack-plugin": "^6.3.2",
+    "css-loader": "^5.0.1",
+    "file-loader": "^6.1.1",
+    "html-webpack-plugin": "^4.5.0",
+    "shx": "^0.3.3",
+    "style-loader": "^2.0.0",
+    "webpack": "^5.2.0",
+    "webpack-cli": "^4.1.0",
+    "webpack-dev-server": "^3.11.0",
+    "webpack-merge": "^5.2.0"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.12.1",
+    "ordering-ui": "github:Ordering-Inc/ordering-ui#release",
+    "process": "^0.11.10",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-helmet": "^6.1.0",
+    "react-router-dom": "^5.2.0"
+  }
+}
