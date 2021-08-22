@@ -13,8 +13,8 @@ export const HomePage = (props) => {
   const history = useHistory()
   const [theme] = useTheme()
 
-  const goToPLay = () => {
-    const root = 'localhost'
+  const goToPLay = async () => {
+    const root = 'https://4ac6-190-39-250-82.ngrok.io'
     const response = await fetch(`${root}/api/bingo`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

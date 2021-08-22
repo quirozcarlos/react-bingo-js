@@ -1,21 +1,13 @@
 import io from 'socket.io-client'
 
 export class Socket {
-  constructor ({ url, project, accessToken }) {
+  constructor ({ url }) {
     this.url = url
-    this.project = project
-    this.accessToken = accessToken
     this.queue = []
   }
 
   connect () {
-    this.socket = io(this.url, {
-      extraHeaders: {
-        Authorization: `Bearer ${this.accessToken}`
-      },
-      query: `token=${this.accessToken}&project=${this.project}`,
-      transports: ['websocket']
-    })
+    this.socket = io(this.url, {transports: ['websocket', 'polling', 'flashsocket']})
     this.socket.on('connect', () => {
       let item
       while ((item = this.queue.shift()) !== undefined) {
@@ -44,7 +36,7 @@ export class Socket {
 
   join (room) {
     if (this.socket?.connected) {
-      this.socket.emit('join', `${this.project}_${room}`)
+      this.socket.emit('join', 'connection')
     } else {
       this.queue.push({ action: 'join', room })
     }
@@ -53,7 +45,7 @@ export class Socket {
 
   leave (room) {
     if (this.socket?.connected) {
-      this.socket.emit('leave', `${this.project}_${room}`)
+      this.socket.emit('leave', 'connection')
     } else {
       this.queue.push({ action: 'leave', room })
     }

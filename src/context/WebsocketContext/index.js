@@ -16,7 +16,6 @@ export const WebsocketContext = createContext()
  * @param {props} props
  */
 export const WebsocketProvider = ({ settings, children }) => {
-  // const [session] = useSession()
   const [socket, setSocket] = useState()
 
   const utf8_to_b64 = (str) => {
@@ -24,32 +23,26 @@ export const WebsocketProvider = ({ settings, children }) => {
   }
 
   useEffect(() => {
-    //if (session.loading) return
-    //if (session.auth && settings.url && settings.project) {
-    if (settings.url && settings.project) {
-      const token = utf8_to_b64('carlos')
-      const _socket = new Socket({ ...settings, accessToken: token })
-      // const _socket = new Socket({ ...settings })
+    if (settings.url) {
+      //const token = utf8_to_b64('carlos')
+      const _socket = new Socket(settings)
       setSocket(_socket)
     }
-    // if (!session.auth) {
-    //   socket && socket.close()
-    // }
-  // }, [session])
   }, [])
 
   useEffect(() => {
     if (socket) {
       socket.connect()
       // Get client socket ID
-      // socket.socket.on('connect', () => {
-      //   // console.log('SOCKET CONECCTED', socket.socket.id)
-      // })
+     socket.socket.on('connect', () => {
+      console.log('SOCKET CONECCTED', socket.socket.id)
+    })
     }
     return () => {
       socket && socket.close()
     }
   }, [socket])
+
   return (
     <WebsocketContext.Provider value={socket}>
       {children}

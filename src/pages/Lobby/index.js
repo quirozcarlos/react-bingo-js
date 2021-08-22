@@ -70,20 +70,20 @@ export const Lobby = (props) => {
 
   useEffect(() => {
     const handleSocketEvent = (data) => {
-      console.log(data);
+      console.log('handleSocketEvent: ', data);
     }
     // listen events
-    socket.on('#channel', handleSocketEvent)
+    socket.on('game:joined', handleSocketEvent)
     return () => {
-      socket.off('#channel', handleSocketEvent)
+      socket.off('game:joined', handleSocketEvent)
     }
   }, [socket])
 
   useEffect(() => {
     // emit event
-    socket.join('#channel')
+    socket.join('game:join')
     return () => {
-      socket.leave('#channel')
+      socket.leave('game:join')
     }
   }, [socket])
 
