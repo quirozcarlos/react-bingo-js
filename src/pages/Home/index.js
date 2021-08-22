@@ -13,7 +13,19 @@ export const HomePage = (props) => {
   const history = useHistory()
   const [theme] = useTheme()
 
-  const goToPLay = () => history.push('/pregame')
+  const goToPLay = () => {
+    const root = 'localhost'
+    const response = await fetch(`${root}/api/bingo`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'join'
+      })
+    })
+    const result = await response.json()
+    console.log(result);
+    history.push('/pregame')
+  }
 
   return (
     <>

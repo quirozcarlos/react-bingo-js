@@ -13,7 +13,9 @@ export const PreGame = (props) => {
   const history = useHistory()
   const [theme] = useTheme()
 
-  const goToPLay = () => history.push('/lobby')
+  const goToPLay = () => {
+    history.push('/lobby')
+  }
 
   return (
     <>

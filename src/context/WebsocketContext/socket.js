@@ -10,10 +10,10 @@ export class Socket {
 
   connect () {
     this.socket = io(this.url, {
-      // extraHeaders: {
-      //   Authorization: `Bearer ${this.accessToken}`
-      // },
-      // query: `token=${this.accessToken}&project=${this.project}`,
+      extraHeaders: {
+        Authorization: `Bearer ${this.accessToken}`
+      },
+      query: `token=${this.accessToken}&project=${this.project}`,
       transports: ['websocket']
     })
     this.socket.on('connect', () => {
