@@ -19,12 +19,17 @@ export const WebsocketProvider = ({ settings, children }) => {
   // const [session] = useSession()
   const [socket, setSocket] = useState()
 
+  const utf8_to_b64 = (str) => {
+    return window.btoa(unescape(encodeURIComponent(str)));
+  }
+
   useEffect(() => {
-    // if (session.loading) return
-    // if (session.auth && settings.url && settings.project) {
+    //if (session.loading) return
+    //if (session.auth && settings.url && settings.project) {
     if (settings.url && settings.project) {
-      // const _socket = new Socket({ ...settings, accessToken: session.token })
-      const _socket = new Socket({ ...settings })
+      const token = utf8_to_b64('carlos')
+      const _socket = new Socket({ ...settings, accessToken: token })
+      // const _socket = new Socket({ ...settings })
       setSocket(_socket)
     }
     // if (!session.auth) {
