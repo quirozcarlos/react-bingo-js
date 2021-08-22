@@ -6,10 +6,11 @@ import {
   Link
 } from 'react-router-dom'
 
-import { Header, Footer, SpinnerLoader, NotNetworkConnectivity, useOnlineStatus, Alert } from 'ordering-ui'
+import { SpinnerLoader, NotNetworkConnectivity, useOnlineStatus } from 'ordering-ui'
 
 import { HomePage } from './pages/Home'
 import { Lobby } from './pages/Lobby'
+import { PreGame } from './pages/PreGame'
 import { PageNotFound } from './pages/PageNotFound'
 
 import { ListenPageChanges } from './components/ListenPageChanges'
@@ -35,10 +36,6 @@ export const App = () => {
       {
         loaded && (
           <>
-            {/* <Header
-              isHome={isHome}
-              location={location}
-            /> */}
             <NotNetworkConnectivity />
             {onlineStatus && (
               <Switch>
@@ -50,6 +47,9 @@ export const App = () => {
                 </Route>
                 <Route exact path='/lobby'>
                   <Lobby />
+                </Route>
+                <Route exact path='/pregame'>
+                  <PreGame />
                 </Route>
                 <Route path='*'>
                   <PageNotFound />

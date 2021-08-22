@@ -4,6 +4,7 @@ import { ThemeProvider } from 'ordering-ui'
 import { Router } from './router'
 import theme from './theme.json'
 import settings from './config.json'
+import { WebsocketProvider } from '../src/context/WebsocketContext'
 
 /**
  * Theme images
@@ -39,6 +40,8 @@ theme.images = {
 const wrapper = document.getElementById('app')
 ReactDOM.render(
   <ThemeProvider theme={theme}>
-    <Router />
+    <WebsocketProvider settings={Object.assign(settings.socket, { project: settings.project, appId: settings.app_id })}>
+      <Router />
+    </WebsocketProvider>
   </ThemeProvider>
   , wrapper)

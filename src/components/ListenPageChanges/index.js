@@ -11,7 +11,8 @@ export const ListenPageChanges = ({ children }) => {
 
   const routes = {
     home: '/',
-    lobby: '/lobby'
+    pregrame: '/pregrame',
+    lobby: '/lobby',
   }
 
   const handleGoToPage = ({ page, params = {}, search, replace = false }) => {
