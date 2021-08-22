@@ -36,7 +36,8 @@ export class Socket {
 
   join (room) {
     if (this.socket?.connected) {
-      this.socket.emit('join', 'connection')
+      console.log('join', room);
+      this.socket.emit(room, 'hola')
     } else {
       this.queue.push({ action: 'join', room })
     }
@@ -45,7 +46,7 @@ export class Socket {
 
   leave (room) {
     if (this.socket?.connected) {
-      this.socket.emit('leave', 'connection')
+      this.socket.emit(room)
     } else {
       this.queue.push({ action: 'leave', room })
     }
