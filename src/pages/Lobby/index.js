@@ -73,6 +73,7 @@ export const Lobby = (props) => {
       console.log('handleSocketEvent: ', data);
     }
     // listen events
+    console.log('inside');
     socket.on('game:joined', handleSocketEvent)
     return () => {
       socket.off('game:joined', handleSocketEvent)
@@ -81,6 +82,7 @@ export const Lobby = (props) => {
 
   useEffect(() => {
     // emit event
+    console.log('inside 2');
     socket.join('game:join')
     return () => {
       socket.leave('game:join')
