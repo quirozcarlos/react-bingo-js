@@ -15,15 +15,26 @@ import { PageNotFound } from './pages/PageNotFound'
 
 import { ListenPageChanges } from './components/ListenPageChanges'
 
+import { useUser } from './context/UserContext'
+
+import { getItem } from './utils'
+
+const userData = getItem('userdata')
+
 export const App = () => {
   const [loaded, setLoaded] = useState(false)
   const onlineStatus = useOnlineStatus()
+  const [userState, setUserState] = useUser()
 
   useEffect(() => {
     setTimeout(() => {
       setLoaded(true)
     }, 1000)
   }, [])
+
+  useEffect(() => {
+    setUserState(userData)
+  }, [userData])
 
   return (
     <>
@@ -39,17 +50,26 @@ export const App = () => {
             <NotNetworkConnectivity />
             {onlineStatus && (
               <Switch>
-                <Route exact path='/home'>
-                  <HomePage />
-                </Route>
                 <Route exact path='/'>
-                  <HomePage />
+                  {!userState?.board ? (
+                    <HomePage />
+                  ) : (
+                    <Redirect to='/pre-game' />
+                  )}
+                </Route>
+                <Route exact path='/pre-game'>
+                  {userState?.board ? (
+                    <PreGame />
+                  ) : (
+                    <Redirect to='/' />
+                  )}
                 </Route>
                 <Route exact path='/lobby'>
-                  <Lobby />
-                </Route>
-                <Route exact path='/pregame'>
-                  <PreGame />
+                  {userState?.board ? (
+                    <Lobby />
+                  ) : (
+                    <Redirect to='/' />
+                  )}
                 </Route>
                 <Route path='*'>
                   <PageNotFound />

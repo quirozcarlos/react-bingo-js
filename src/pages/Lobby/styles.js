@@ -125,10 +125,14 @@ export const BallCounted = styled.div`
   width: 25px;
   height: 25px;
   font-size: 20px;
+  margin: 0 10px;
   ${props => props.color && css`
     background-color: ${props.color};
   `};
   ${props => props.textcolor && css`
     color: ${props.textcolor};
+  `};
+  ${props => props.isCurrent && css`
+    box-shadow: 0px 0px 0px 10px #FF0000;
   `};
 `

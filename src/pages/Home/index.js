@@ -1,6 +1,11 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button, useTheme } from 'ordering-ui'
-import { useHistory } from 'react-router-dom'
+import {
+  Switch,
+  Route,
+  Redirect,
+  Link
+} from 'react-router-dom'
 import {
   HeroContainer,
   ContentWrapper,
@@ -8,24 +13,59 @@ import {
   Slogan,
   DarkBackground
 } from './styles'
+import { getItem, setItem } from '../../utils'
+import setting from '../../config.json'
+import { useUser } from '../../context/UserContext'
+import { useWebsocket } from '../../context/WebsocketContext'
 
 export const HomePage = (props) => {
-  const history = useHistory()
   const [theme] = useTheme()
+  const [userState, setUser] = useState({ loading: false, error: null, result: null })
+  const [, setUserState] = useUser()
+  const socket = useWebsocket()
+  const [isSocketConnected, setIsSocketConnected] = useState(false)
+
+  const userData = getItem('userdata')
 
   const goToPLay = async () => {
-    const root = 'https://4ac6-190-39-250-82.ngrok.io'
-    const response = await fetch(`${root}/api/bingo`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'join'
+    try {
+      setUser({ ...userState, loading: true })
+      const root = setting.socket.url
+      const response = await fetch(`${root}/api/bingo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'join'
+        })
       })
-    })
-    const result = await response.json()
-    console.log(result);
-    history.push('/pregame')
+      const userdata = await response.json()
+      setItem('userdata', userdata)
+      setUserState(userdata)
+      setUser({ ...userState, loading: false, result: userdata })
+    } catch (error) {
+      setUser({
+        ...userState,
+        loading: false,
+        error
+      })
+      alert(error)
+    }
   }
+
+  useEffect(() => {
+    socket.socket.on('connect', () => {
+      setIsSocketConnected(!!socket.socket.id)
+    })
+
+    const handleSocketEvent = (data) => {
+      alert('Please wait, the room is fully!')
+    }
+
+    socket.on('game:wait', handleSocketEvent)
+    return () => {
+      socket.off('game:wait', handleSocketEvent)
+    }
+  }, [socket])
 
   return (
     <>
@@ -38,8 +78,9 @@ export const HomePage = (props) => {
             color='secundary'
             onClick={goToPLay}
             style={{ color: '#FFF' }}
+            disabled={!isSocketConnected}
           >
-            Go to play
+            {userState.loading ? 'Loading...' : 'Go to play'}
           </Button>
         </ContentWrapper>
       </HeroContainer>

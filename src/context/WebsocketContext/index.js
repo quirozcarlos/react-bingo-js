@@ -18,13 +18,8 @@ export const WebsocketContext = createContext()
 export const WebsocketProvider = ({ settings, children }) => {
   const [socket, setSocket] = useState()
 
-  const utf8_to_b64 = (str) => {
-    return window.btoa(unescape(encodeURIComponent(str)));
-  }
-
   useEffect(() => {
     if (settings.url) {
-      //const token = utf8_to_b64('carlos')
       const _socket = new Socket(settings)
       setSocket(_socket)
     }
@@ -34,9 +29,9 @@ export const WebsocketProvider = ({ settings, children }) => {
     if (socket) {
       socket.connect()
       // Get client socket ID
-     socket.socket.on('connect', () => {
-      console.log('SOCKET CONECCTED', socket.socket.id)
-    })
+       socket.socket.on('connect', () => {
+        console.log('SOCKET CONNECTED', socket.socket.id)
+      })
     }
     return () => {
       socket && socket.close()

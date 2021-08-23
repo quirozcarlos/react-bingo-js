@@ -34,10 +34,9 @@ export class Socket {
     }
   }
 
-  join (room) {
+  join (room, data) {
     if (this.socket?.connected) {
-      console.log('join', room);
-      this.socket.emit(room, 'hola')
+      this.socket.emit(room, data)
     } else {
       this.queue.push({ action: 'join', room })
     }

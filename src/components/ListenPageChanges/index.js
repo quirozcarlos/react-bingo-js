@@ -11,7 +11,7 @@ export const ListenPageChanges = ({ children }) => {
 
   const routes = {
     home: '/',
-    pregrame: '/pregrame',
+    pregrame: '/pre-grame',
     lobby: '/lobby',
   }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Button, useTheme } from 'ordering-ui'
-import { useHistory } from 'react-router-dom'
+import { useTheme, Confirm } from 'ordering-ui'
+import { useHistory, Redirect } from 'react-router-dom'
 import { useWebsocket } from '../../context/WebsocketContext'
 
 import {
@@ -8,13 +8,32 @@ import {
   ContentWrapper,
   DarkBackground,
   Balls,
-  Cards,
   Cube,
   CubeH,
-  Table,
   Wrapper,
   BallCounted
 } from './styles'
+import { Board } from '../../components/Board'
+import { getColor, getItem } from '../../utils'
+import { useUser } from '../../context/UserContext'
+
+const getNumberColor = (value) => {
+  if (value >= 1 && value <= 15) {
+    return 0
+  }
+  if (value >= 16 && value <= 30) {
+    return 1
+  }
+  if (value >= 31 && value <= 45) {
+    return 2
+  }
+  if (value >= 46 && value <= 60) {
+    return 3
+  }
+  if (value >= 61 && value <= 75) {
+    return 4
+  }
+}
 
 const NUMBERS_LIST = [
   [1,16,31,46,61],
@@ -33,34 +52,27 @@ const NUMBERS_LIST = [
   [14,29,44,59,74],
   [15,30,45,60,75],
 ]
-const CARD_DEFAULT = [[6,19,31,49,64],[8,22,32,52,68],[9,23,0,56,70],[12,25,36,57,73],[13,27,45,58,74]]
-const CURRENT_NUMBERS = [55,43,30,22,12]
-
-const getColor = (value) => {
-  const colors = {
-    0: '#E83D2A',
-    1: '#FF9602',
-    2: '#CA4495',
-    3: '#2D823F',
-    4: '#3B6DCE'
-  }
-
-  return colors[value]
-}
 
 export const Lobby = (props) => {
   const socket = useWebsocket()
-  const history = useHistory()
   const [theme] = useTheme()
+  // const history = useHistory()
   const [selectedNumbers, setSelectedNumbers] = useState({ values: [] })
+  const [userState] = useUser()
+  const [currentNumbers, setCurrentNumbers] = useState({ values: [] })
+  const [confirm, setConfirm] = useState({ open: false, content: null, handleOnAccept: null })
+
+  const CURRENT = []
 
   const handleBingoClick = () => {
-    // alert('Wrong bingo!')
-    console.log(selectedNumbers);
+    socket.join('bingo:callBingo', {
+      ...userState,
+      boardSelected: selectedNumbers.values
+    })
   }
 
   const handleCubeClick = (value) => {
-    if (selectedNumbers.values.includes(value) || !CURRENT_NUMBERS.includes(value)) {
+    if (selectedNumbers.values?.includes(value) || !currentNumbers.values.includes(value)) {
       return
     }
     setSelectedNumbers({
@@ -70,24 +82,36 @@ export const Lobby = (props) => {
 
   useEffect(() => {
     const handleSocketEvent = (data) => {
-      console.log('handleSocketEvent: ', data);
+      CURRENT.push(data)
+      setCurrentNumbers({ values: CURRENT })
     }
-    // listen events
-    console.log('inside');
-    socket.on('game:joined', handleSocketEvent)
+
+    const handleGameOver = (data) => {
+      setConfirm({
+        open: true,
+        content: data ? `User ${data} is the winner!` : 'There are no winners!',
+        handleOnAccept: () => {
+          window.localStorage.clear()
+          window.location.href = '/'
+          setConfirm({ ...confirm, open: false })
+        }
+      })
+    }
+    socket.on('bingo:callNumber', handleSocketEvent)
+    socket.on('game:over', handleGameOver)
     return () => {
-      socket.off('game:joined', handleSocketEvent)
+      socket.off('bingo:callNumber', handleSocketEvent)
+      socket.off('game:over', handleGameOver)
+      socket.leave('bingo:callBingo')
     }
   }, [socket])
 
-  useEffect(() => {
-    // emit event
-    console.log('inside 2');
-    socket.join('game:join')
-    return () => {
-      socket.leave('game:join')
-    }
-  }, [socket])
+  // useEffect(() => {
+  //   if (socket.socket.disconnected) {
+  //     window.localStorage.clear()
+  //     history.push('/')
+  //   }
+  // }, [socket])
 
   return (
     <>
@@ -95,61 +119,24 @@ export const Lobby = (props) => {
       <HeroContainer bgimage={theme.images?.general?.homeHero}>
         <ContentWrapper>
           <Balls>
-            {CURRENT_NUMBERS.map((value, i) => (
+            {currentNumbers.values.slice(Math.max(currentNumbers.values.length - 5, 0)).map((value, i) => (
               <BallCounted
                 key={i}
-                color={getColor(i)}
+                color={getColor(getNumberColor(value))}
                 textcolor={'#FFF'}
+                isCurrent={i === 4}
               >
                 {value}
               </BallCounted>
             ))}
           </Balls>
           <Wrapper>
-            <div>
-              <Cards>
-                <Table>
-                  <thead>
-                    <tr>
-                      <CubeH color={getColor(0)}>B</CubeH>
-                      <CubeH color={getColor(1)}>I</CubeH>
-                      <CubeH color={getColor(2)}>N</CubeH>
-                      <CubeH color={getColor(3)}>G</CubeH>
-                      <CubeH color={getColor(4)}>O</CubeH>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {CARD_DEFAULT.map((row, i) => (
-                      <tr key={i}>
-                        {row.map((value) => (
-                          <Cube
-                            key={value}
-                            style={{ cursor: 'pointer' }}
-                            color={selectedNumbers.values.includes(value) ? 'gray' : 'white'}
-                            onClick={() => handleCubeClick(value)}
-                          >
-                            {value === 0 ? '*' : value}
-                          </Cube>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <td colSpan={5}>
-                        <Button
-                          color='primary'
-                          onClick={handleBingoClick}
-                          style={{ width: '100%', borderRadius: 0 }}
-                        >
-                          BINGO!
-                        </Button>
-                      </td>
-                    </tr>
-                  </tfoot>
-                </Table>
-              </Cards>
-            </div>
+            <Board
+              board={userState?.board}
+              selectedNumbers={selectedNumbers}
+              handleBingoClick={handleBingoClick}
+              handleCubeClick={handleCubeClick}
+            />
 
             <div>
               <table>
@@ -170,7 +157,7 @@ export const Lobby = (props) => {
                           key={value}
                           // style={{ cursor: 'pointer' }}
                           style={{ padding:0, fontSize:15, width: 15, height:15 }}
-                          color={CURRENT_NUMBERS.includes(value) ? 'gray' : 'white'}
+                          color={currentNumbers.values.includes(value) ? 'gray' : 'white'}
                         >
                           {value}
                         </Cube>
@@ -183,6 +170,16 @@ export const Lobby = (props) => {
           </Wrapper>
         </ContentWrapper>
       </HeroContainer>
+      <Confirm
+        title='Bingo Info'
+        content={confirm.content}
+        acceptText='Accept'
+        open={confirm.open}
+        onClose={() => setConfirm({ ...confirm, open: false })}
+        onCancel={() => setConfirm({ ...confirm, open: false })}
+        onAccept={confirm.handleOnAccept}
+        closeOnBackdrop={false}
+      />
     </>
   )
 }

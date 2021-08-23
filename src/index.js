@@ -5,6 +5,7 @@ import { Router } from './router'
 import theme from './theme.json'
 import settings from './config.json'
 import { WebsocketProvider } from '../src/context/WebsocketContext'
+import { UserProvider } from '../src/context/UserContext'
 
 /**
  * Theme images
@@ -41,7 +42,9 @@ const wrapper = document.getElementById('app')
 ReactDOM.render(
   <ThemeProvider theme={theme}>
     <WebsocketProvider settings={Object.assign(settings.socket, { project: settings.project, appId: settings.app_id })}>
-      <Router />
+      <UserProvider>
+        <Router />
+      </UserProvider>
     </WebsocketProvider>
   </ThemeProvider>
   , wrapper)
